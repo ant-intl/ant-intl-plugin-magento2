@@ -1,0 +1,28 @@
+{
+    "name": "antom-magento/magento2",
+    "description": "Antom payments suites for magento 2",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "antom/global-open-sdk-php": "^1.0",
+        "antom-magento/magento2-core": "1.0.0",
+        "antom-magento/magento2-frontend": "1.0.0",
+        "antom-magento/magento2-adminhtml": "1.0.0"
+    },
+    "type": "metapackage",
+    "license": [
+        "MIT"
+    ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        }
+    ],
+    "config": {
+        "allow-plugins": {
+            "magento/composer-dependency-version-audit-plugin": true,
+            "magento/magento-composer-installer": true
+        }
+    }
+}

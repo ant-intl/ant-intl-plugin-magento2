@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+
+    strategy:
+      matrix:
+        include:
+          - php-version: 7.4
+          - php-version: 8.1
+          - php-version: 8.2
+
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: bcmath, ctype, curl, dom, gd, hash, iconv, intl, mbstring, openssl, pdo_mysql, simplexml, soap, xsl, zip
+          tools: composer:v2
+          coverage: xdebug
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ matrix.php-version }}-${{ hashFiles('**/composer.json.ci') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-${{ matrix.php-version }}-
+            ${{ runner.os }}-composer-
+
+      - name: Configure Magento authentication
+        run: |
+          mkdir -p $HOME/.composer
+          echo '{"http-basic": {"repo.magento.com": {"username": "${{ secrets.MAGENTO_USERNAME }}", "password": "${{ secrets.MAGENTO_PASSWORD }}"}}}' > $HOME/.composer/auth.json
+
+      - name: Debug - Check files before setup
+        run: |
+          echo "Files in root directory:"
+          ls -la
+          echo "Checking if composer.json.ci exists:"
+          if [ -f "composer.json.ci" ]; then
+            echo "✅ composer.json.ci found"
+          else
+            echo "❌ composer.json.ci not found"
+          fi
+
+      - name: Setup CI environment
+        run: |
+          # 检查文件存在
+          if [ ! -f "composer.json.ci" ]; then
+            echo "❌ composer.json.ci not found!"
+            exit 1
+          fi
+          
+          # 备份原始 composer.json
+          cp composer.json composer.json.backup
+          
+          # 使用 CI 版本的 composer.json
+          cp composer.json.ci composer.json
+          
+          echo "✅ Switched to CI composer.json"
+          
+          # 验证 composer.json 格式
+          composer validate --no-check-all
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Verify installation
+        run: |
+          echo "🔍 Verifying installation..."
+          php -v
+          composer show --installed | head -10
+
+      - name: Run PHP Syntax Check
+        run: |
+          echo "🔍 Checking PHP syntax..."
+          find . -name "*.php" -not -path "./vendor/*" -not -path "./build/*" -exec php -l {} \;
+
+      - name: Basic validation summary
+        if: always()
+        run: |
+          echo "## 🎯 CI Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| PHP Version | ${{ matrix.php-version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Module | Antom Magento |" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | ${{ job.status }} |" >> $GITHUB_STEP_SUMMARY
+          
+          echo ""
+          echo "✅ CI validation complete"
+          echo "📊 PHP version: ${{ matrix.php-version }}"
+          echo "🏗️ Antom Magento"
+          echo "🎯 Status: ${{ job.status }}"
