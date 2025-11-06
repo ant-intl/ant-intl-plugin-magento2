@@ -3,9 +3,9 @@
     "description": "Antom payments suites for magento 2",
     "require": {
         "antom/global-open-sdk-php": "^1.0",
-        "antom-magento/magento2-core": "0.1.0",
+        "antom-magento/magento2-core": "0.1.1",
         "antom-magento/magento2-frontend": "0.1.0",
-        "antom-magento/magento2-adminhtml": "0.1.0"
+        "antom-magento/magento2-adminhtml": "0.1.1"
     },
     "type": "metapackage",
     "license": [
