@@ -4,7 +4,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "antom/global-open-sdk-php": "^1.0",
+        "antom/global-open-sdk-php": "v1.4.11",
         "antom-magento/magento2-core": "1.0.0",
         "antom-magento/magento2-frontend": "1.0.0",
         "antom-magento/magento2-adminhtml": "1.0.0"
