@@ -37,7 +37,7 @@ It handles secure payment processing, notifications, and automatic order status 
 From your Magento root directory run:
 
 ```
-composer require antom-magento/magento2
+composer require antom/magento2
 ```
 To enable all Antom modules
 ```
