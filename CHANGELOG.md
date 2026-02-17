@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-02-03
+Upgraded Credit Card payment integration with Element SDK
+- Enhanced payment security and compliance
+
+
 ## [1.0.0] - 2025-11-07
 Initial release of Antom payment extension for Magento 2.
 
